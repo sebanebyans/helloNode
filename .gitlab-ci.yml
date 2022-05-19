@@ -1,0 +1,17 @@
+stages:
+  - install
+  - build
+  - test
+  - docker
+  - deploy
+  - release
+
+include:
+  - '/gitlab/install.gitlab-ci.yml'
+  - '/gitlab/build.gitlab-ci.yml'
+  - '/gitlab/test.lint.gitlab-ci.yml'
+  - '/gitlab/test.unit.gitlab-ci.yml'
+  - '/gitlab/docker.gitlab-ci.yml'
+  - '/gitlab/deploy.gitlab-ci.yml'
+  - '/gitlab/release.gitlab-ci.yml'
+  - '/gitlab/githubflow.flow.gitlab-ci.yml'

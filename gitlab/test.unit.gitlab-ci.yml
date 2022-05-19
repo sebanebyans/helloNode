@@ -1,0 +1,94 @@
+.unit_cache:
+  cache:
+    key: $CI_PROJECT_ID
+    paths:
+      - ./node_modules
+      - ./.next/cache/
+      - ./.yarn-cache
+    policy: pull
+
+#BEFORE SCRIPT
+.unit_before_script:
+  before_script:
+
+#AFTER SCRIPT
+.unit_after_script:
+  after_script:
+
+#SCRIPT
+.unit_test_script:
+  script:
+    - >
+      if [ "$NPM_INSTALL" = "true" ]; then
+        npm config set cache /cache/npm --global
+        npm run test:unit
+      else
+        yarn config set cache-folder /cache/.yarn-cache 
+        yarn run test:unit
+      fi
+
+#ARTIFACTS
+.unit_artifacts:
+  artifacts:
+    when: always
+    expire_in: 2 yr
+    reports:
+      junit: report.xml
+
+#TAGS
+.unit_tags:
+  tags: []
+
+#-------------------------------
+# BASE
+#-------------------------------
+.unit:
+  image: node:14-alpine
+  stage: test
+  extends:
+    - .unit_tags
+    - .unit_before_script
+    - .unit_test_script
+    - .unit_after_script
+    - .unit_cache
+    - .unit_artifacts
+  allow_failure: true
+
+#-------------------------------
+# EVENTS
+#-------------------------------
+.event_dev: {}
+.event_dev_mr: {}
+.event_staging: {}
+.event_prod: {}
+
+#-------------------------------
+# JOBS
+#-------------------------------
+test:unit:feature:dev:
+  extends:
+    - .unit
+    - .event_dev
+  variables:
+    STAGE: dev
+
+test:unit:feature:dev:mr:
+  extends:
+    - .unit
+    - .event_dev_mr
+  variables:
+    STAGE: dev
+
+test:unit:feature:staging:
+  extends:
+    - .unit
+    - .event_staging
+  variables:
+    STAGE: staging
+
+test:unit:prod:
+  extends:
+    - .unit
+    - .event_prod
+  variables:
+    STAGE: prod

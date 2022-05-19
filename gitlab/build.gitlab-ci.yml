@@ -1,0 +1,93 @@
+.build_cache:
+  cache:
+    key: $CI_PROJECT_ID
+    paths:
+      - ./node_modules
+      - ./.next/cache/
+      - ./.yarn-cache
+    policy: pull-push
+
+#BEFORE SCRIPT
+.build_before_script:
+  before_script:
+
+#AFTER SCRIPT
+.build_after_script:
+  after_script:
+
+#SCRIPTS
+.build_script:
+  script:
+    - >
+      if [ "$NPM_INSTALL" = "true" ]; then
+        npm config set cache /cache/npm --global
+        npm run build
+      else
+        yarn config set cache-folder /cache/.yarn-cache 
+        yarn build
+      fi
+
+#ARTIFACTS
+.build_artifacts:
+  artifacts:
+    paths:
+      - outputs/
+
+#TAGS
+.build_tags:
+  tags: []
+
+#-------------------------------
+# BASE
+#-------------------------------
+.build:
+  image: node:14-alpine
+  stage: build
+  timeout: 4h 0m
+  extends:
+    - .build_tags
+    - .build_before_script
+    - .build_script
+    - .build_after_script
+    - .build_cache
+    - .build_artifacts
+  allow_failure: false
+
+#-------------------------------
+# EVENTS
+#-------------------------------
+.event_dev: {}
+.event_dev_mr: {}
+.event_staging: {}
+.event_prod: {}
+
+#-------------------------------
+# JOBS
+#-------------------------------
+build:feature:dev:
+  extends:
+    - .build
+    - .event_dev
+  environment:
+    name: Dev
+
+build:feature:dev:mr:
+  extends:
+    - .build
+    - .event_dev_mr
+  environment:
+    name: Dev
+
+build:feature:staging:
+  extends:
+    - .build
+    - .event_staging
+  environment:
+    name: Staging
+
+build:prod:
+  extends:
+    - .build
+    - .event_prod
+  environment:
+    name: Prod

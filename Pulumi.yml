@@ -1,0 +1,4 @@
+name: front-back
+runtime: nodejs
+description: Fargate con nextjs for Backoffice front
+main: ./infra/index.ts

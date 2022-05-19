@@ -1,0 +1,56 @@
+.release_cache:
+  cache:
+    key: $CI_PIPELINE_IID
+    paths:
+      - ./node_modules
+      - ./.next/cache/
+      - ./.yarn-cache
+    policy: pull-push
+
+#BEFORE SCRIPT
+.release_before_script:
+  before_script:
+    - apk add git
+    - npm install -g semantic-release@17.3.9 @semantic-release/git@9.0.0 @semantic-release/gitlab@6.0.9 @semantic-release/npm@7.0.10 @semantic-release/changelog@5.0.1
+
+#AFTER SCRIPT
+.release_after_script:
+  after_script:
+
+#SCRIPT
+.release_script:
+  script:
+    - semantic-release
+
+#-------------------------------
+# BASE
+#-------------------------------
+.release:
+  image: node:14-alpine
+  stage: release
+  timeout: 4h 0m
+  extends:
+    - .release_before_script
+    - .release_script
+    - .release_after_script
+    - .release_cache
+  allow_failure: false
+
+#-------------------------------
+# EVENTS
+#-------------------------------
+.event_dev: {}
+.event_dev_mr: {}
+.event_staging: {}
+.event_prod: {}
+
+#-------------------------------
+# JOBS
+#-------------------------------
+release:staging:
+  extends:
+    - .release
+    - .event_staging
+  environment:
+    name: Staging
+  when: manual

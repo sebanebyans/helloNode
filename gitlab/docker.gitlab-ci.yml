@@ -1,0 +1,104 @@
+.docker_cache:
+  cache:
+    key: $CI_PROJECT_ID
+    paths:
+      - ./node_modules
+      - ./.next/cache/
+      - ./.yarn-cache
+    policy: pull-push
+
+#BEFORE SCRIPT
+.docker_before_script:
+  before_script:
+    - apk add jq
+
+#AFTER SCRIPT
+.docker_after_script:
+  after_script:
+
+#SCRIPTS
+.docker_script:
+  script:
+    - export VERSION=$(cat package.json | jq -r .version)
+    - docker login registry.gitlab.com -u CI_JOB_TOKEN -p $CI_JOB_TOKEN
+    - docker build --build-arg STAGE=$STAGE --build-arg PORT=3000 --build-arg CI_JOB_TOKEN=${CI_JOB_TOKEN} -t $CONTAINER_IMAGE:$VERSION$VERSION_STAGE .
+    - docker push $CONTAINER_IMAGE
+
+#ARTIFACTS
+.docker_artifacts:
+  artifacts:
+    paths:
+      - outputs/
+
+#TAGS
+.docker_tags:
+  tags: []
+
+#-------------------------------
+# BASE
+#-------------------------------
+.docker:
+  image: docker:stable
+  stage: docker
+  services:
+    - docker:dind
+  variables:
+    CONTAINER_IMAGE: registry.gitlab.com/$CI_PROJECT_PATH
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
+  timeout: 4h 0m
+  extends:
+    - .docker_tags
+    - .docker_before_script
+    - .docker_script
+    - .docker_after_script
+    - .docker_cache
+    - .docker_artifacts
+  allow_failure: false
+
+#-------------------------------
+# EVENTS
+#-------------------------------
+.event_dev: {}
+.event_dev_mr: {}
+.event_staging: {}
+.event_prod: {}
+
+#-------------------------------
+# JOBS
+#-------------------------------
+docker:feature:dev:
+  variables:
+    VERSION_STAGE: -beta
+  extends:
+    - .docker
+    - .event_dev
+  environment:
+    name: Dev
+
+docker:feature:dev:mr:
+  variables:
+    VERSION_STAGE: -beta
+  extends:
+    - .docker
+    - .event_dev_mr
+  environment:
+    name: Dev
+
+docker:feature:staging:
+  variables:
+    VERSION_STAGE: -rc
+  extends:
+    - .docker
+    - .event_staging
+  environment:
+    name: Staging
+
+docker:prod:
+  variables:
+    VERSION_STAGE: ''
+  extends:
+    - .docker
+    - .event_prod
+  environment:
+    name: Prod

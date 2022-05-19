@@ -1,0 +1,99 @@
+.deploy_cache:
+  cache:
+    key: $CI_PROJECT_ID
+    paths:
+      - ./node_modules
+      - ./.next/cache/
+      - ./.yarn-cache
+    policy: pull-push
+
+#BEFORE SCRIPT
+.deploy_before_script:
+  before_script:
+    - apk add --no-cache curl bash
+    - curl -fsSL https://get.pulumi.com/ | bash
+
+#AFTER SCRIPT
+.deploy_after_script:
+  after_script:
+
+#SCRIPT
+.deploy_script:
+  script:
+    - >
+      if [ "$NPM_INSTALL" = "true" ]; then
+        npm config set cache /cache/npm --global
+        npm run deploy
+      else
+        yarn config set cache-folder /cache/.yarn-cache 
+        yarn deploy
+      fi
+
+#ARTIFACTS
+.deploy_artifacts:
+  artifacts:
+    paths:
+      - outputs/
+
+#TAGS
+.deploy_tags:
+  tags: []
+
+#-------------------------------
+# BASE
+#-------------------------------
+.deploy:
+  image: node:14-alpine
+  stage: deploy
+  timeout: 4h 0m
+  extends:
+    - .deploy_tags
+    - .deploy_before_script
+    - .deploy_script
+    - .deploy_after_script
+    - .deploy_cache
+    - .deploy_artifacts
+  allow_failure: false
+
+#-------------------------------
+# EVENTS
+#-------------------------------
+.event_dev: {}
+.event_dev_mr: {}
+.event_staging: {}
+.event_prod: {}
+
+#-------------------------------
+# JOBS
+#-------------------------------
+deploy:feature:dev:
+  extends:
+    - .deploy
+    - .event_dev
+  environment:
+    name: Dev
+  when: manual
+
+deploy:feature:dev:mr:
+  extends:
+    - .deploy
+    - .event_dev_mr
+  environment:
+    name: Dev
+  when: manual
+
+deploy:feature:staging:
+  extends:
+    - .deploy
+    - .event_staging
+  environment:
+    name: Staging
+  when: manual
+
+deploy:prod:
+  extends:
+    - .deploy
+    - .event_prod
+  environment:
+    name: Prod
+  when: manual

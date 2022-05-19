@@ -1,0 +1,6 @@
+encryptionsalt: v1:w/CW7h2uf4c=:v1:3+UQahZGm7HScBUx:UMWTFcfy1eq84/fWcqO8dFEteyzwPg==
+config:
+  aws:region: us-east-1
+  front-back:docker-image: registry.gitlab.com/grupo95/front-backoffice
+  front-back:docker-image-stage: prod
+  front-back:environment: prod
