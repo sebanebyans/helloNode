@@ -27,5 +27,5 @@ app.get("/", async (req, res) => {
 })
 
 
-const port = process.env.PORT || 80
+const port = process.env.PORT || 3002
 app.listen(port, () => console.log(`Listening on port ${port}`))
