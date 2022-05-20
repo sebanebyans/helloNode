@@ -1,13 +1,13 @@
 const path = require('path');
 const { version } = require('./package.json');
 
-const BASE_URL_DEV = 'https://backofficetested.herokuapp.com';
-const BASE_URL_STAGING = 'https://backofficetested.herokuapp.com';
-const BASE_URL_PROD = 'https://backofficetested.herokuapp.com';
+const BASE_URL_DEV = 'https://backoffice-staging.tested.cl/';
+const BASE_URL_STAGING = 'https://backoffice-staging.tested.cl/';
+const BASE_URL_PROD = 'https://backoffice-staging.tested.cl/';
 
 const envs = {
   local: {
-    BASE_URL: ' https://backofficetested.herokuapp.com/',
+    BASE_URL: ' https://backoffice-staging.tested.cl//',
     GRAPHQL_GATEWAY: '',
     GOOGLE_ANALYTICS_ID: 'UA-XXXXXXXXX-1',
     GTM_ID: 'GTM-XXXXXXX',
