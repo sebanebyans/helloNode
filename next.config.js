@@ -5,9 +5,10 @@ const BASE_URL_DEV = 'https://backoffice-staging.tested.cl/';
 const BASE_URL_STAGING = 'https://backoffice-staging.tested.cl/';
 const BASE_URL_PROD = 'https://backoffice-staging.tested.cl/';
 
+
 const envs = {
   local: {
-    BASE_URL: ' https://backoffice-staging.tested.cl/',
+    BASE_URL: ' https://backofficetested.herokuapp.com/',
     GRAPHQL_GATEWAY: '',
     GOOGLE_ANALYTICS_ID: 'UA-XXXXXXXXX-1',
     GTM_ID: 'GTM-XXXXXXX',
@@ -27,7 +28,7 @@ const envs = {
     RELEASE: version,
     COGNITO_USER_POOL_ID: 'us-east-1_Lv35Argjq',
     COGNITO_APP_CLIENT_ID: '3p8qnfj97rqrfapplkpg5k8gga',
-    COGNITO_DOMAIN: 'backoffice-staging.tested.auth.us-east-1.amazoncognito.com',
+    COGNITO_DOMAIN: 'backoffice-dev-tested.auth.us-east-1.amazoncognito.com',
     COGNITO_USER_GROUP: 'Backoffice-Dev',
   },
   staging: {
